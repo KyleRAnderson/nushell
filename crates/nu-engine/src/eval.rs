@@ -610,13 +610,17 @@ pub fn eval_expression(
             }
         }
         Expr::GlobPattern(s) => {
-            let cwd = current_dir_str(engine_state, stack)?;
-            let path = expand_path_with(s, cwd);
+            if s.is_empty() {
+                Ok(Value::Nothing { span: expr.span })
+            } else {
+                let cwd = current_dir_str(engine_state, stack)?;
+                let path = expand_path_with(s, cwd);
 
-            Ok(Value::String {
-                val: path.to_string_lossy().to_string(),
-                span: expr.span,
-            })
+                Ok(Value::String {
+                    val: path.to_string_lossy().to_string(),
+                    span: expr.span,
+                })
+            }
         }
         Expr::Signature(_) => Ok(Value::Nothing { span: expr.span }),
         Expr::Garbage => Ok(Value::Nothing { span: expr.span }),
